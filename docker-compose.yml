@@ -1,0 +1,9 @@
+services:
+  app-lab:
+    build: .
+    container_name: secure-upload-lab
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./storage:/app/storage
+    restart: unless-stopped

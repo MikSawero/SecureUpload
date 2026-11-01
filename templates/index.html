@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Upload Lab</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f9; }
+        .box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .vuln { border-left: 5px solid #d9534f; }
+        .secure { border-left: 5px solid #5cb85c; }
+        code { background: #eee; padding: 2px 6px; }
+    </style>
+</head>
+<body>
+    <h1>Secure Upload Mechanism</h1>
+
+    <div class="box vuln">
+        <h2>Vulnerable Version</h2>
+        <form action="/upload-vulnerable" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Upload (Insecure)</button>
+        </form>
+    </div>
+
+    <div class="box secure">
+        <h2>Secure Version</h2>
+        <form action="/upload-secure" method="POST" enctype="multipart/form-data">
+            <label>Simulated User:</label>
+            <select name="user_id">
+                <option value="user_A">User A</option>
+                <option value="user_B">User B</option>
+            </select><br><br>
+            <input type="file" name="file" required>
+            <button type="submit">Upload (Secure)</button>
+        </form>
+    </div>
+
+    <div class="box">
+        <h3>System Files List</h3>
+        <ul>
+            {% for fname, owner in files.items() %}
+                <li>
+                    <code>{{ fname }}</code> (Owner: <strong>{{ owner }}</strong>) | 
+                    Download as User A: <a href="/download/{{ fname }}?user_id=user_A">Download</a> | 
+                    Download as User B: <a href="/download/{{ fname }}?user_id=user_B">Download</a>
+                </li>
+            {% else %}
+                <li>No files uploaded to the secure storage yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

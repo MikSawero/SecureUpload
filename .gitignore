@@ -1,0 +1,12 @@
+storage/uploads_vulnerable/*
+storage/quarantine/*
+storage/safe_area/*
+!storage/uploads_vulnerable/.gitkeep
+!storage/quarantine/.gitkeep
+!storage/safe_area/.gitkeep
+
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+.env
