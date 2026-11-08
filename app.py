@@ -5,7 +5,8 @@ from flask import Flask, request, render_template, send_from_directory
 
 app = Flask(__name__)
 
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 
+MAX_SECURE_SIZE = 2 * 1024 * 1024
+# app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 
 UPLOAD_VULN = 'storage/uploads_vulnerable'
 QUARANTINE = 'storage/quarantine'
@@ -37,15 +38,11 @@ def check_magic_bytes(stream):
         
     return None
 
-@app.errorhandler(413)
-def file_too_large(e):
-    return "Size is too large (max 2MB)", 413
-
 @app.route('/')
 def index():
     return render_template('index.html', files=file_owners)
 
-#Insecure version
+# Insecure version
 @app.route('/upload-vulnerable', methods=['POST'])
 def upload_vulnerable():
     if 'file' not in request.files:
@@ -57,11 +54,17 @@ def upload_vulnerable():
     
     filename = file.filename
     filepath = os.path.join(UPLOAD_VULN, filename)
-    file.save(filepath)
+    
+    with open(filepath, 'wb') as f:
+        while True:
+            chunk = file.stream.read(1024 * 1024)
+            if not chunk:
+                break
+            f.write(chunk)
     
     return f"Saved vulnerable file as: {filepath}"
 
-#Secure version
+# Secure version
 @app.route('/upload-secure', methods=['POST'])
 def upload_secure():
     if 'file' not in request.files:
@@ -70,7 +73,11 @@ def upload_secure():
     
     if file.filename == '':
         return "Please choose file", 400
-
+    
+    content_length = request.content_length
+    if content_length and content_length > MAX_SECURE_SIZE:
+        return f"Size is too large (max {MAX_SECURE_SIZE}, got {content_length})", 400
+    
     current_user = request.form.get('user_id', 'user_A')
 
     # Magic bytes check

@@ -4,6 +4,7 @@ storage/safe_area/*
 !storage/uploads_vulnerable/.gitkeep
 !storage/quarantine/.gitkeep
 !storage/safe_area/.gitkeep
+test_results
 
 .vscode/
 __pycache__/
